@@ -41,7 +41,7 @@ module Sidekiq
       include Util
 
       INITIAL_WAIT = 10
-      FRACTION_TO_RUN = 0.1
+      FRACTION_TO_RUN = 0.0
 
       def initialize
         @enq = (Sidekiq.options[:scheduled_enq] || Sidekiq::Scheduled::Enq).new
