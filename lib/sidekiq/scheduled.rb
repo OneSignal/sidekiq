@@ -43,6 +43,7 @@ module Sidekiq
       include Util
 
       INITIAL_WAIT = 10
+      FRACTION_TO_RUN = 0.1
 
       def initialize
         @enq = (Sidekiq.options[:scheduled_enq] || Sidekiq::Scheduled::Enq).new
@@ -63,15 +64,17 @@ module Sidekiq
       end
 
       def start
-        @thread ||= safe_thread("scheduler") {
-          initial_wait
+        if rand() < FRACTION_TO_RUN
+          @thread ||= safe_thread("scheduler") {
+            initial_wait
 
-          until @done
-            enqueue
-            wait
-          end
-          Sidekiq.logger.info("Scheduler exiting...")
-        }
+            until @done
+              enqueue
+              wait
+            end
+            Sidekiq.logger.info("Scheduler exiting...")
+          }
+        end
       end
 
       def enqueue
