@@ -61,14 +61,16 @@ module Sidekiq
       end
 
       def start
-        @thread ||= safe_thread("scheduler") do
-          initial_wait
+        if ENV['SIDEKIQ_STARTUP_CHECKS'] != '0'
+          @thread ||= safe_thread("scheduler") do
+            initial_wait
 
-          while !@done
-            enqueue
-            wait
+            while !@done
+              enqueue
+              wait
+            end
+            Sidekiq.logger.info("Scheduler exiting...")
           end
-          Sidekiq.logger.info("Scheduler exiting...")
         end
       end
 
